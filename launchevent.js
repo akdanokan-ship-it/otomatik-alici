@@ -63,6 +63,18 @@ function onNewMessageComposeHandler(event) {
       (ekle.cc || []).forEach(function (a) { if (!mevcut[kucuk(a)]) { mevcut[kucuk(a)] = true; eklenecekCc.push(a); } });
     });
 
+    // GEÇİCİ TEŞHİS: sorun çözülünce bu bloğu silin
+    try {
+      item.notificationMessages.replaceAsync("teshis", {
+        type: Office.MailboxEnums.ItemNotificationMessageType.InformationalMessage,
+        message: ("Teşhis | tür: " + tur + " | ilk TO: " + (gonderen || "-") +
+                  " | kural: " + (ayar.kurallar || []).length +
+                  " | eklenecek: " + (eklenecekTo.concat(eklenecekCc).join(", ") || "yok")).substring(0, 150),
+        icon: "Icon.16",
+        persistent: true
+      });
+    } catch (e) {}
+
     var isler = [];
     if (eklenecekTo.length) isler.push(asenkron(function (cb) { item.to.addAsync(eklenecekTo, cb); }));
     if (eklenecekCc.length) isler.push(asenkron(function (cb) { item.cc.addAsync(eklenecekCc, cb); }));
