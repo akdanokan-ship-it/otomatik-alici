@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+           xsi:type="MailApp">
+  <Id>f5cb8839-6356-45be-a0eb-0ae53007b45b</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>ATPTech</ProviderName>
+  <DefaultLocale>tr-TR</DefaultLocale>
+  <DisplayName DefaultValue="Otomatik Alıcı"/>
+  <Description DefaultValue="Yanıtlarda kurallara göre TO/CC alanına otomatik alıcı ekler."/>
+  <IconUrl DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/assets/icon-128.png"/>
+  <SupportUrl DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/otomatik-alici/launchevent.html"/>
+  <AppDomains>
+    <AppDomain>https://akdanokan-ship-it.github.io</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.1"/>
+    </Sets>
+  </Requirements>
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/otomatik-alici/launchevent.html"/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+  <Permissions>ReadWriteItem</Permissions>
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+  </Rule>
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Requirements>
+      <bt:Sets DefaultMinVersion="1.3">
+        <bt:Set Name="Mailbox"/>
+      </bt:Sets>
+    </Requirements>
+    <Hosts>
+      <Host xsi:type="MailHost">
+        <!-- Sadece eski (1.10 öncesi) Outlook sürümleri içindir; güncel sürümler aşağıdaki V1_1 bölümünü kullanır -->
+        <DesktopFormFactor>
+          <FunctionFile resid="WebViewRuntime.Url"/>
+          <ExtensionPoint xsi:type="MessageComposeCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="grpOtomatikAlici">
+                <Label resid="Group.Label"/>
+                <Control xsi:type="Button" id="btnOtomatikAlici">
+                  <Label resid="Button.Label"/>
+                  <Supertip>
+                    <Title resid="Button.Label"/>
+                    <Description resid="Button.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>onNewMessageComposeHandler</FunctionName>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/assets/icon-16.png"/>
+        <bt:Image id="Icon.32" DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/assets/icon-32.png"/>
+        <bt:Image id="Icon.80" DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="WebViewRuntime.Url" DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/otomatik-alici/launchevent.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="Group.Label" DefaultValue="Alıcı"/>
+        <bt:String id="Button.Label" DefaultValue="Alıcı Ekle"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="Button.Tooltip" DefaultValue="Kurallara göre alıcı ekler."/>
+      </bt:LongStrings>
+    </Resources>
+
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+      <Requirements>
+        <bt:Sets DefaultMinVersion="1.10">
+          <bt:Set Name="Mailbox"/>
+        </bt:Sets>
+      </Requirements>
+      <Hosts>
+        <Host xsi:type="MailHost">
+          <Runtimes>
+            <!-- Web / yeni Outlook / Mac HTML dosyasını, klasik Windows Outlook doğrudan JS dosyasını kullanır -->
+            <Runtime resid="WebViewRuntime.Url">
+              <Override type="javascript" resid="JSRuntime.Url"/>
+            </Runtime>
+          </Runtimes>
+          <DesktopFormFactor>
+            <FunctionFile resid="WebViewRuntime.Url"/>
+            <ExtensionPoint xsi:type="LaunchEvent">
+              <LaunchEvents>
+                <LaunchEvent Type="OnNewMessageCompose" FunctionName="onNewMessageComposeHandler"/>
+              </LaunchEvents>
+              <SourceLocation resid="WebViewRuntime.Url"/>
+            </ExtensionPoint>
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+      <Resources>
+        <bt:Urls>
+          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/otomatik-alici/launchevent.html"/>
+          <bt:Url id="JSRuntime.Url" DefaultValue="https://akdanokan-ship-it.github.io/bileti-kapat-addin/otomatik-alici/launchevent.js"/>
+        </bt:Urls>
+      </Resources>
+    </VersionOverrides>
+  </VersionOverrides>
+</OfficeApp>
