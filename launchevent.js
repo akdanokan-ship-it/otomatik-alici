@@ -2,7 +2,7 @@
 // Yeni mail / Yanıtla / Tümünü yanıtla / İlet anında otomatik çalışır.
 // Kurallar kurallar.json dosyasında tutulur.
 
-var KURAL_ADRESI = "https://akdanokan-ship-it.github.io/bileti-kapat-addin/otomatik-alici/kurallar.json";
+var KURAL_ADRESI = "https://akdanokan-ship-it.github.io/otomatik-alici/kurallar.json";
 
 function kucuk(s) { return (s || "").trim().toLowerCase(); }
 
