@@ -35,12 +35,23 @@ function kuralUyarMi(kural, olay, gonderen, yanitlayan) {
   return true;
 }
 
+function bekle(ms) { return new Promise(function (c) { setTimeout(c, ms); }); }
+
+// Yanıt alıcıları bazı istemcilerde olaydan hemen sonra dolar; kısa süre tekrar dene
+function toGetir(item, deneme) {
+  return asenkron(function (cb) { item.to.getAsync(cb); }).then(function (to) {
+    if ((to && to.length) || deneme >= 5) return to || [];
+    return bekle(400).then(function () { return toGetir(item, deneme + 1); });
+  });
+}
+
 function onNewMessageComposeHandler(event) {
+  console.log("[OtomatikAlici] olay tetiklendi");
   var item = Office.context.mailbox.item;
 
   Promise.all([
     asenkron(function (cb) { item.getComposeTypeAsync(cb); }),
-    asenkron(function (cb) { item.to.getAsync(cb); }),
+    toGetir(item, 0),
     asenkron(function (cb) { item.cc.getAsync(cb); }),
     kurallariGetir()
   ]).then(function (s) {
@@ -63,6 +74,7 @@ function onNewMessageComposeHandler(event) {
       (ekle.cc || []).forEach(function (a) { if (!mevcut[kucuk(a)]) { mevcut[kucuk(a)] = true; eklenecekCc.push(a); } });
     });
 
+    console.log("[OtomatikAlici]", tur, gonderen, (ayar.kurallar || []).length, eklenecekTo, eklenecekCc);
     // GEÇİCİ TEŞHİS: sorun çözülünce bu bloğu silin
     try {
       item.notificationMessages.replaceAsync("teshis", {
@@ -79,7 +91,7 @@ function onNewMessageComposeHandler(event) {
     if (eklenecekTo.length) isler.push(asenkron(function (cb) { item.to.addAsync(eklenecekTo, cb); }));
     if (eklenecekCc.length) isler.push(asenkron(function (cb) { item.cc.addAsync(eklenecekCc, cb); }));
     return Promise.all(isler);
-  }).then(function () { event.completed(); }, function () { event.completed(); });
+  }).then(function () { event.completed(); }, function (e) { console.log("[OtomatikAlici] hata", e); event.completed(); });
 }
 
 // Manifest'teki FunctionName ile eşleştirme (klasik Outlook için zorunlu)
