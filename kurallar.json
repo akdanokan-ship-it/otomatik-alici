@@ -2,15 +2,31 @@
   "kurallar": [
     {
       "ad": "Gizem'den gelen mailler dijital kuyruğa",
-      "gonderen": ["gizem.korkmazcan@atptech.com"],
-      "olaylar": ["yanit"],
-      "ekle": { "to": ["ATPDIGITALCRM@atptech.com"] }
+      "gonderen": [
+        "gizem.korkmazcan@atptech.com"
+      ],
+      "olaylar": [
+        "yanit"
+      ],
+      "ekle": {
+        "to": [
+          "ATPDIGITALCRM@atptech.com"
+        ]
+      }
     },
     {
       "ad": "Özge'den gelen mailler Gizem'e",
-      "gonderen": ["ozge.ozbek@atptech.com"],
-      "olaylar": ["yanit"],
-      "ekle": { "to": ["gizem.korkmazcan@atptech.com"] }
+      "gonderen": [
+        "ozge.ozbek@atptech.com"
+      ],
+      "olaylar": [
+        "yanit"
+      ],
+      "ekle": {
+        "to": [
+          "gizem.korkmazcan@atptech.com"
+        ]
+      }
     }
   ]
 }
