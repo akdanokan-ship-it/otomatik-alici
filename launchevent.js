@@ -74,6 +74,17 @@ function baslikta(adres, baslik) {
   return !!baslik && baslik.indexOf(kucuk(adres)) > -1;
 }
 
+// Alıcılardan en az biri iç alan adlarının (ör. atptech.com ve alt alan adları) dışında mı?
+function disAliciVarMi(alicilar, icAlanAdlari) {
+  var ic = (icAlanAdlari || []).map(kucuk);
+  if (!ic.length) return false;
+  return alicilar.some(function (r) {
+    var alan = (kucuk(r.emailAddress).split("@")[1]) || "";
+    if (!alan) return false;
+    return !ic.some(function (d) { return alan === d || alan.slice(-(d.length + 1)) === "." + d; });
+  });
+}
+
 function kuralUyarMi(kural, olay, gonderen, yanitlayan) {
   if (kural.olaylar && kural.olaylar.indexOf(olay) === -1) return false;
   var gonderenListesi = (kural.gonderen || []).map(kucuk);
@@ -108,16 +119,23 @@ function onNewMessageComposeHandler(event) {
     asenkron(function (cb) { item.getComposeTypeAsync(cb); }),
     toGetir(item, 0),
     asenkron(function (cb) { item.cc.getAsync(cb); }),
+    asenkron(function (cb) { item.bcc.getAsync(cb); }),
     kurallariGetir()
   ]).then(function (s) {
     var tur = s[0] ? s[0].composeType : null;          // "newMail" | "reply" | "forward"
-    var to = s[1] || [], cc = s[2] || [], ayar = s[3] || {};
+    var to = s[1] || [], cc = s[2] || [], bcc = s[3] || [], ayar = s[4] || {};
     var olay = tur === "reply" ? "yanit" : tur === "forward" ? "ilet" : "yeni";
     var gonderen = olay === "yanit" && to.length ? kucuk(to[0].emailAddress) : "";
     var yanitlayan = kucuk(Office.context.mailbox.userProfile.emailAddress);
 
-    var uyanlar = (ayar.kurallar || []).filter(function (k) { return kuralUyarMi(k, olay, gonderen, yanitlayan); });
-    if (!uyanlar.length) { teshis(item, "tür: " + tur + " | gönderen: " + (gonderen || "-") + " | uyan kural yok"); return; }
+    // Kurallar sadece TO/CC/BCC'de şirket dışı bir adres varsa çalışsın
+    var disAliciVar = disAliciVarMi(to.concat(cc, bcc), ayar.icAlanAdlari);
+    var uyanlar = (ayar.kurallar || []).filter(function (k) {
+      var disGerekli = k.sadeceDisAliciVarsa !== undefined ? k.sadeceDisAliciVarsa : ayar.sadeceDisAliciVarsa;
+      if (disGerekli && !disAliciVar) return false;
+      return kuralUyarMi(k, olay, gonderen, yanitlayan);
+    });
+    if (!uyanlar.length) { teshis(item, "tür: " + tur + " | gönderen: " + (gonderen || "-") + " | dış alıcı: " + (disAliciVar ? "var" : "yok") + " | uyan kural yok"); return; }
 
     // Yanıtlarda orijinal maildeki kişileri de kontrol et
     var baslikIsi = olay === "yanit" ? orijinalBaslik(item, 0) : Promise.resolve("");
